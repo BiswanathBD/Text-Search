@@ -5,7 +5,6 @@ import { Link } from "react-router";
 
 const App = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
-  console.log(searchTerm);
 
   const articleData = [
     {
@@ -40,6 +39,22 @@ const App = () => {
     },
   ];
 
+  const highlightText = (text) => {
+    if (!searchTerm) return text;
+
+    const parts = text.split(new RegExp(`(${searchTerm})`, "gi"));
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === searchTerm.toLowerCase() ? (
+        <span key={index} className="bg-yellow-300">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-4">
       <nav className="flex justify-between items-center">
@@ -47,7 +62,7 @@ const App = () => {
         <a
           href="https://github.com/BiswanathBD/Text-Search"
           target="_blank"
-          className="bg-black text-white px-4 py-2 rounded-full text-semibold flex items-center gap-2"
+          className="bg-black text-white font-bold px-4 py-2 rounded-full text-semibold flex items-center gap-2"
         >
           <FaGithub /> <span>Repository</span>
         </a>
@@ -63,19 +78,32 @@ const App = () => {
         />
         <p
           onClick={() => setSearchTerm("")}
-          className="absolute top-1/2 right-3 hover:text-red-600"
+          className={`${
+            searchTerm ? "absolute" : "hidden"
+          } top-1/2 right-3 hover:text-red-600`}
         >
           <RxCross2 size={18} />
         </p>
       </section>
-      <p className="text-green-700">
-        <strong>{articleData.length} posts</strong> were found.
-      </p>
-      <article>
+      {searchTerm ? (
+        <p className="text-yellow-600">Searching for "{searchTerm}"</p>
+      ) : (
+        <p className="text-gray-600">
+          <strong>{articleData.length} articles</strong> were found.
+        </p>
+      )}
+      <article className="mt-4">
         {articleData.map((article) => (
-          <div key={article.id} className="border-b border-gray-300 py-4">
-            <h2 className="text-xl font-semibold">{article.title}</h2>
-            <p className="text-gray-700 mt-2">{article.content}</p>
+          <div
+            key={article.id}
+            className="p-4 shadow-lg/5 rounded-lg mb-6 hover:shadow-lg/10 transition-all duration-300 hover:scale-101"
+          >
+            <h2 className="text-xl font-semibold">
+              {highlightText(article.title)}
+            </h2>
+            <p className="text-gray-700 mt-2">
+              {highlightText(article.content)}
+            </p>
           </div>
         ))}
       </article>
